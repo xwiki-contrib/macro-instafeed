@@ -132,15 +132,18 @@ require(['jquery', 'instafeed'], function($, Instafeed) {
     $('.myInstaFeed').each(function (index) {
       var id = 'myInstaFeed_' + index;
       $(this).attr('id', id);
-      var size = $(this).data('size');
-      var resolution = 'thumbnail';
       var feed = new Instafeed({
-          get: 'user',
+          get: $(this).data('get'),
           userId: 'self',
+          tagName: $(this).data('tag'),
+          sortBy: 'none',
           accessToken: $(this).data('accesstoken'),
           target: id,
           limit: $(this).data('maxcount'),
-          resolution: resolution
+          resolution: $(this).data('size'),
+          links: true,
+          mock: false,
+          useHttp: false
       });
       feed.run();
     });
@@ -259,7 +262,7 @@ require(['jquery', 'instafeed'], function($, Instafeed) {
   margin: 0.5em;
 }
 
-.myInstaFeed.smallest &gt; a &gt; img {
+.myInstaFeed.panel &gt; a &gt; img {
   width: 75px;
 }</code>
     </property>
@@ -400,7 +403,7 @@ require(['jquery', 'instafeed'], function($, Instafeed) {
 #set ($discard = $xwiki.jsx.use('Instafeed.Code.Macro'))
 #set ($discard = $xwiki.ssx.use('Instafeed.Code.Macro'))
 {{html clean="false"}}
-  &lt;div class="myInstaFeed ${escapetool.xml($xcontext.macro.params.size)}" data-accesstoken="$escapetool.xml($xcontext.macro.params.accessToken)" data-maxcount="$escapetool.xml($xcontext.macro.params.maxCount)" data-size="$escapetool.xml($xcontext.macro.params.size)"&gt;
+  &lt;div class="myInstaFeed ${escapetool.xml($xcontext.macro.params.displayer)}" data-accesstoken="$escapetool.xml($xcontext.macro.params.accessToken)" data-maxcount="$escapetool.xml($xcontext.macro.params.maxCount)" data-size="$escapetool.xml($xcontext.macro.params.size)" data-get="$escapetool.xml($xcontext.macro.params.get)" data-tag="$escapetool.xml($xcontext.macro.params.tagName)"&gt;
   &lt;/div&gt;
 {{/html}}
 {{/velocity}}</code>
@@ -487,7 +490,7 @@ require(['jquery', 'instafeed'], function($, Instafeed) {
       <defaultValue/>
     </property>
     <property>
-      <description>Access Token</description>
+      <description>Access Token provided by Instagram. Please read the documentation of the extension</description>
     </property>
     <property>
       <mandatory>1</mandatory>
@@ -553,7 +556,7 @@ require(['jquery', 'instafeed'], function($, Instafeed) {
       <defaultValue>20</defaultValue>
     </property>
     <property>
-      <description/>
+      <description>Max number of images displayed. Default value is 20.</description>
     </property>
     <property>
       <mandatory>0</mandatory>
@@ -616,16 +619,216 @@ require(['jquery', 'instafeed'], function($, Instafeed) {
       </name>
     </class>
     <property>
-      <defaultValue>thumbail</defaultValue>
+      <defaultValue>thumbnail</defaultValue>
     </property>
     <property>
-      <description/>
+      <description>Default value is "thumbnail" (150 px). Can also be "low_resolution" (306 px)  or "standard_resolution" (612 px)</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>size</name>
+    </property>
+  </object>
+  <object>
+    <name>Instafeed.Code.Macro</name>
+    <number>3</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>2e3d7340-5469-4ac0-a74c-d852e12111d8</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>user</defaultValue>
+    </property>
+    <property>
+      <description>Default option is "user" (show images from the access token account).
+Can also be "tagged" (use tagName to specify the tag) or "location" (add locationId to the code to specify the location)</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>get</name>
+    </property>
+  </object>
+  <object>
+    <name>Instafeed.Code.Macro</name>
+    <number>4</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>645dda17-8a05-4582-a84f-02e2398ce527</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Name of the tag to get, need to be used with get value to "tagged".</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>tagName</name>
+    </property>
+  </object>
+  <object>
+    <name>Instafeed.Code.Macro</name>
+    <number>5</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>d4cd6bc3-ce8f-4802-bdc4-46037d30394c</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>content</defaultValue>
+    </property>
+    <property>
+      <description>Default value is "content".
+Can also be "panel" to display images in a panel</description>
     </property>
     <property>
       <mandatory/>
     </property>
     <property>
-      <name>size</name>
+      <name>displayer</name>
     </property>
   </object>
 </xwikidoc>

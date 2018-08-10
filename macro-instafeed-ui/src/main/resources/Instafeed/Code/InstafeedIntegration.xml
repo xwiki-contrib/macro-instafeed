@@ -129,13 +129,7 @@
     function Instafeed(params, context) {
       var option, value;
       this.options = {
-        target: 'instafeed',
-        get: 'popular',
-        resolution: 'thumbnail',
-        sortBy: 'none',
-        links: true,
-        mock: false,
-        useHttp: false
+        target: 'instafeed'
       };
       if (typeof params === 'object') {
         for (option in params) {
